@@ -73,6 +73,7 @@ base_info <- lyrics %>%
       album_name == "Red Deluxe Edition" ~ "Red (Deluxe Edition)",
       album_name == "Red Taylors Version" ~ "Red (Taylor's Version)",
       album_name == "1989 Deluxe" ~ "1989 (Deluxe)",
+      album_name == "1989 Taylors Version" ~ "1989 (Taylor's Version)",
       album_name == "Reputation" ~ "reputation",
       album_name == "Folklore" ~ "folklore",
       album_name == "Folklore Deluxe Edition" ~ "folklore (deluxe edition)",
@@ -264,6 +265,7 @@ spotify <- tribble(
   "Red",                                 "1KlU96Hw9nlvqpBPlSqcTV",
   "Red (Taylor's Version)",              "6kZ42qRrzov54LcAk4onW9",
   "1989",                                "34OkZVpuzBa9y40DCy0LPR",
+  "1989 (Taylor's Version)",             "64LU4c1nfjz1t4VnGhagcg",
   "reputation",                          "6DEjYFkNZh67HP7R9PSZvv",
   "Lover",                               "1NAmidJlEaVgA3MpcPFYGq",
   "folklore",                            "1pzvBxYgT6OVwJLtHkrdQK",
@@ -435,26 +437,31 @@ taylor_album_songs <- taylor_all_songs %>%
   filter(album_name %in% c("Taylor Swift", "Fearless (Taylor's Version)",
                            "Speak Now (Taylor's Version)",
                            "Red (Taylor's Version)", "1989",
+                           "1989 (Taylor's Version)",
                            "reputation", "Lover", "folklore", "evermore",
                            "Midnights"))
 
-site <- read_html("https://www.metacritic.com/person/taylor-swift")
-metacritic <- html_table(site) %>%
-  pluck(2) %>%
-  separate_wider_regex(`Title:`,
-                       patterns = c(metacritic_score = "[0-9|tbd]*",
-                                    "\\n\\n[ ]*",
-                                    album_name = ".*")) %>%
-  mutate(metacritic_score = na_if(metacritic_score, "tbd"),
-         metacritic_score = as.integer(metacritic_score),
-         album_name = str_replace_all(album_name, fixed("[Taylor's Version]"),
-                                      "(Taylor's Version)")) %>%
-  select(album_name, metacritic_score, user_score = `User score:`)
+#site <- read_html("https://www.metacritic.com/person/taylor-swift")
+#metacritic <- html_table(site) %>%
+#  pluck(2) %>%
+#  separate_wider_regex(`Title:`,
+#                       patterns = c(metacritic_score = "[0-9|tbd]*",
+#                                    "\\n\\n[ ]*",
+#                                    album_name = ".*")) %>%
+#  mutate(metacritic_score = na_if(metacritic_score, "tbd"),
+#         metacritic_score = as.integer(metacritic_score),
+#         album_name = str_replace_all(album_name, fixed("[Taylor's Version]"),
+#                                      "(Taylor's Version)")) %>%
+#  select(album_name, metacritic_score, user_score = `User score:`)
+#
+#taylor_albums <- taylor_all_songs %>%
+#  distinct(album_name, ep, album_release) %>%
+#  filter(!is.na(album_name)) %>%
+#  left_join(metacritic, by = "album_name") %>%
+#  arrange(album_release)
 
-taylor_albums <- taylor_all_songs %>%
-  distinct(album_name, ep, album_release) %>%
-  filter(!is.na(album_name)) %>%
-  left_join(metacritic, by = "album_name") %>%
-  arrange(album_release)
+taylor_albums <- taylor::taylor_albums %>%
+  add_row(album_name = "1989 (Taylor's Version)", ep = FALSE,
+          album_release = as.Date("2023-10-27"), metacritic_score = 95)
 
-use_data(taylor_all_songs, taylor_album_songs, taylor_albums, overwrite = TRUE)
+usethis::use_data(taylor_all_songs, taylor_album_songs, taylor_albums, overwrite = TRUE)

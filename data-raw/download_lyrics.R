@@ -1,7 +1,9 @@
 library(tidyverse)
 library(rvest)
 
-album_list <- read_html("https://genius.com/a/read-all-the-lyrics-to-taylor-swifts-new-album-1989-taylors-version") %>%
+album_link <- "https://genius.com/a/read-all-the-lyrics-to-taylor-swifts-new-album-1989-taylors-version"
+
+album_list <- read_html(album_link) %>%
   html_nodes("li") %>%
   html_nodes("a") %>%
   html_attr("href") %>%
@@ -9,13 +11,13 @@ album_list <- read_html("https://genius.com/a/read-all-the-lyrics-to-taylor-swif
 
 outpath <- "data-raw/lyrics/05b_1989-taylors-version"
 
-num = 1
+num <- 1
 for (link in album_list) {
   num_label <- str_pad(num, 2, side = "left", pad = "0")
 
   outfile <- link %>%
     str_extract("(?<=Taylor-swift-).*(?=-taylors-version)") %>%
-    {str_glue("{num_label}_{.}.txt")}
+    {str_glue("{num_label}_{.}-tv.txt")}
 
   print(str_glue("Downloading lyrics for {outfile}"))
 
@@ -25,7 +27,5 @@ for (link in album_list) {
     str_c() %>%
     write_lines(file = str_glue("{outpath}/{outfile}"))
 
-  num = num + 1
+  num <- num + 1
 }
-
-
