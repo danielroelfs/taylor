@@ -64,5 +64,5 @@ test_that("non-TV versions are excluded when possible", {
     as.character(counts$no_tv[which(counts$Freq > 1)])
   )
 
-  expect_false(any(exclude_albums %in% taylor_album_songs$album_name))
+  expect_false(any(exclude_albums %in% unique(taylor_album_songs$album_name)))
 })
