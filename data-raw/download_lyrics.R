@@ -1,7 +1,9 @@
 library(tidyverse)
 library(rvest)
 
+# nolint start
 album_link <- "https://genius.com/a/read-all-the-lyrics-to-taylor-swifts-new-album-1989-taylors-version"
+# nolint end
 
 album_list <- read_html(album_link) %>%
   html_nodes("li") %>%
@@ -17,7 +19,9 @@ for (link in album_list) {
 
   outfile <- link %>%
     str_extract("(?<=Taylor-swift-).*(?=-taylors-version)") %>%
+    # nolint start
     {str_glue("{num_label}_{.}-tv.txt")}
+    # nolint end
 
   print(str_glue("Downloading lyrics for {outfile}"))
 
